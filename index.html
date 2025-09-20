@@ -90,11 +90,31 @@
       }
     });
 
-    window.addEventListener("load", function () {
-      if (window.confirm("Join @CrixZy for more updates?")) {
-        window.location.href = "https://t.me/+RT_XWFZCSE5kNWU1";
+    // --- Anti-inspection Code ---
+
+    // Disable right-click context menu
+    document.addEventListener('contextmenu', event => event.preventDefault());
+
+    // Disable developer tools shortcuts
+    document.addEventListener('keydown', function(e) {
+      // F12
+      if (e.key === 'F12') {
+        e.preventDefault();
+      }
+      // Ctrl+Shift+I
+      if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+        e.preventDefault();
+      }
+      // Ctrl+Shift+J
+      if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+        e.preventDefault();
+      }
+      // Ctrl+U
+      if (e.ctrlKey && e.key === 'U') {
+        e.preventDefault();
       }
     });
   </script>
 </body>
 </html>
+
