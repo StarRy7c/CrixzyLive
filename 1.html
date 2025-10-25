@@ -11,7 +11,7 @@
       margin: 0;
       padding: 0;
       overflow: hidden;
-      font-family: sans-serif;
+      font-family: "Poppins", sans-serif;
     }
     html, body {
       height: 100%;
@@ -24,64 +24,175 @@
     .plyr {
       height: 100%;
     }
-    /* Style for the network speed indicator */
-    .speed-display {
+
+    /* Telegram Popup Styling */
+    .telegram-popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      flex-direction: column;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      backdrop-filter: blur(8px);
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+
+    .popup-box {
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      padding: 25px 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.3);
+      animation: slideUp 0.6s ease;
+      max-width: 350px;
+    }
+
+    @keyframes slideUp {
+      from {transform: translateY(20px); opacity: 0;}
+      to {transform: translateY(0); opacity: 1;}
+    }
+
+    .popup-box h2 {
+      margin-bottom: 15px;
+      font-size: 22px;
+    }
+
+    .popup-buttons {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 20px;
+    }
+
+    .popup-btn {
+      background: #0088cc;
+      border: none;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .popup-btn:hover {
+      background: #00aaff;
+      transform: scale(1.05);
+    }
+
+    .cancel-btn {
+      background: #444;
+    }
+
+    /* Telegram button inside player */
+    .telegram-btn {
       position: absolute;
       top: 15px;
+      right: 15px;
+      background: rgba(0,136,204,0.85);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 200;
+      transition: background 0.3s ease;
+    }
+
+    .telegram-btn:hover {
+      background: #00aaff;
+    }
+
+    /* Network speed indicator */
+    .speed-display {
+      position: absolute;
+      bottom: 10px;
       right: 15px;
       background-color: rgba(0, 0, 0, 0.6);
       color: white;
       padding: 5px 10px;
       border-radius: 5px;
-      font-size: 14px;
+      font-size: 13px;
       font-family: monospace;
-      z-index: 100;
-      display: none; /* Hide by default */
-      pointer-events: none; /* Make it non-interactive */
+      z-index: 150;
+      display: none;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
-  <video id="player" autoplay muted controls crossorigin playsinline></video>
-  <!-- Element to display network speed -->
-  <div id="speedDisplay" class="speed-display"></div>
+  <!-- Telegram Popup -->
+  <div class="telegram-popup" id="telegramPopup">
+    <div class="popup-box">
+      <h2>🎉 Join Our Telegram Channel</h2>
+      <p>Get instant live updates, highlights, and exclusive content!</p>
+      <div class="popup-buttons">
+        <button class="popup-btn" id="joinBtn">Join Now</button>
+        <button class="popup-btn cancel-btn" id="cancelBtn">Later</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Video Player -->
+  <div style="position:relative;">
+    <a href="https://t.me/+OACGYQBHrIJmM2Y1" target="_blank" class="telegram-btn">Join Telegram</a>
+    <video id="player" muted controls crossorigin playsinline></video>
+    <div id="speedDisplay" class="speed-display"></div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.1.4/dist/hls.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/plyr@3.6.12/dist/plyr.min.js"></script>
   <script>
+    const popup = document.getElementById('telegramPopup');
+    const joinBtn = document.getElementById('joinBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const video = document.getElementById('player');
+    const speedDisplay = document.getElementById('speedDisplay');
+
+    // Block video until popup is dismissed
+    video.pause();
+    video.style.filter = 'blur(5px)';
+    
+    joinBtn.onclick = () => {
+      window.open("https://t.me/+OACGYQBHrIJmM2Y1", "_blank");
+      closePopup();
+    };
+
+    cancelBtn.onclick = () => {
+      closePopup();
+    };
+
+    function closePopup() {
+      popup.style.display = 'none';
+      video.style.filter = 'none';
+      video.play();
+    }
+
+    // --- Player setup ---
+    const plyrOptions = {
+      seekTime: 10,
+      controls: [
+        'play-large','rewind','play','fast-forward','progress','current-time',
+        'duration','mute','volume','settings','pip','fullscreen'
+      ]
+    };
+
     document.addEventListener('DOMContentLoaded', () => {
-      const video = document.getElementById('player');
-      const speedDisplay = document.getElementById('speedDisplay');
-
-      // --- START: CUSTOM PLYR OPTIONS ---
-      const plyrOptions = {
-        seekTime: 10,
-        controls: [
-          'play-large',
-          'rewind',
-          'play',
-          'fast-forward',
-          'progress',
-          'current-time',
-          'duration',
-          'mute',
-          'volume',
-          'settings',
-          'pip',          // Added Picture-in-Picture (miniplayer) button
-          'fullscreen'
-        ]
-      };
-      // --- END: CUSTOM PLYR OPTIONS ---
-
-      function getQueryParam(param) {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(param);
-      }
-
-      const source = getQueryParam('stream');
-
+      const source = new URLSearchParams(window.location.search).get('stream');
       if (!source) {
-        document.body.innerHTML = '<p style="color:white; text-align:center; margin-top:20%;">No stream link provided!</p>';
+        document.body.innerHTML = '<p style="color:white;text-align:center;margin-top:20%;">No stream link provided!</p>';
         return;
       }
 
@@ -90,85 +201,52 @@
         hls.loadSource(source);
         hls.attachMedia(video);
 
-        // --- START: Network Speed Indicator Logic ---
-        let lastLoadedBytes = 0;
-        let lastLoadTime = performance.now();
-
-        // Periodically check the hls.js stats to calculate speed
-        const speedCheckInterval = setInterval(() => {
-            const stats = hls.stats;
-            const now = performance.now();
-            const durationInSeconds = (now - lastLoadTime) / 1000;
-            const currentTotalBytes = stats.total;
-            const bytesLoadedSinceLastCheck = currentTotalBytes - lastLoadedBytes;
-
-            // Only calculate and display if time has passed and data has been loaded
-            if (durationInSeconds > 0 && bytesLoadedSinceLastCheck > 0) {
-                speedDisplay.style.display = 'block'; // Show the indicator
-                const speedBps = (bytesLoadedSinceLastCheck * 8) / durationInSeconds; // bits per second
-
-                let speedText = '';
-                if (speedBps > 1000000) { // If speed is over 1 Mbps
-                    speedText = (speedBps / 1000000).toFixed(2) + ' Mbps';
-                } else if (speedBps > 1000) { // If speed is over 1 Kbps
-                    speedText = (speedBps / 1000).toFixed(1) + ' Kbps';
-                } else {
-                    speedText = Math.round(speedBps) + ' bps';
-                }
-                speedDisplay.textContent = speedText;
-            }
-
-            lastLoadTime = now;
-            lastLoadedBytes = currentTotalBytes;
-
-        }, 2000); // Update speed every 2 seconds
-        // --- END: Network Speed Indicator Logic ---
-
+        let lastLoadedBytes = 0, lastLoadTime = performance.now();
+        setInterval(() => {
+          const stats = hls.stats || {};
+          const now = performance.now();
+          const duration = (now - lastLoadTime) / 1000;
+          const bytesLoaded = stats.total - lastLoadedBytes;
+          if (duration > 0 && bytesLoaded > 0) {
+            speedDisplay.style.display = 'block';
+            const speedBps = (bytesLoaded * 8) / duration;
+            speedDisplay.textContent = 
+              speedBps > 1e6 ? (speedBps / 1e6).toFixed(2) + ' Mbps' :
+              speedBps > 1e3 ? (speedBps / 1e3).toFixed(1) + ' Kbps' :
+              Math.round(speedBps) + ' bps';
+          }
+          lastLoadTime = now;
+          lastLoadedBytes = stats.total;
+        }, 2000);
 
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          const availableQualities = hls.levels.map(level => level.height);
-          const defaultQuality = availableQualities[0];
-
+          const qualities = hls.levels.map(l => l.height);
           const player = new Plyr(video, {
             ...plyrOptions,
             quality: {
-              default: defaultQuality,
-              options: availableQualities,
+              default: qualities[0],
+              options: qualities,
               forced: true,
-              onChange: (quality) => {
-                hls.levels.forEach((level, levelIndex) => {
-                  if (level.height === quality) {
-                    hls.currentLevel = levelIndex;
-                  }
-                });
-              }
-            }
-          });
-
-          document.addEventListener('fullscreenchange', () => {
-            if (document.fullscreenElement) {
-              if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock('landscape').catch(err => {
-                  console.error('Error locking orientation:', err);
+              onChange: q => {
+                hls.levels.forEach((level, i) => {
+                  if (level.height === q) hls.currentLevel = i;
                 });
               }
             }
           });
         });
-      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      } else {
         video.src = source;
         new Plyr(video, plyrOptions);
-      } else {
-        document.body.innerHTML = '<p>Your browser does not support HLS playback.</p>';
       }
     });
 
-    // --- Anti-inspection Code ---
-    document.addEventListener('contextmenu', event => event.preventDefault());
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) || (e.ctrlKey && e.key === 'U')) {
-        e.preventDefault();
-      }
+    // Anti-inspection
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('keydown', e => {
+      if (['F12'].includes(e.key) || 
+          (e.ctrlKey && e.shiftKey && ['I','J'].includes(e.key)) || 
+          (e.ctrlKey && e.key === 'U')) e.preventDefault();
     });
   </script>
 </body>
