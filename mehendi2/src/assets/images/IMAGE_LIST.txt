@@ -1,0 +1,28 @@
+IMAGE STORAGE REFERENCE
+=======================
+
+Store your actual image files in this directory: src/assets/images/
+
+Below is the mapping of the "keys" used in the code (src/constants.ts) to suggested file names.
+
+KEY NAME (in constants.ts)      SUGGESTED FILENAME          DESCRIPTION
+--------------------------      ------------------          -----------
+heroBg                          hero-bg.jpg                 Main homepage banner background (Dark/Landscape)
+bridalPreview                   bridal-main.jpg             Key image for 'Bridal Mehendi' section
+brideGroom                      bride-groom.jpg             Portrait/Love story mehendi close-up
+panels1                         design-1.jpg                General detailed design sample
+panels2                         design-2.jpg                General detailed design sample
+peacock                         peacock-motif.jpg           Design featuring peacock/birds
+detailedFull                    full-arms.jpg               Full arm bridal design
+classicLeg                      leg-art.jpg                 Leg/Ankle design
+denseArms                       heavy-traditional.jpg       Very dense/intricate traditional work
+footMehndi                      feet-bridal.jpg             Bridal feet close-up
+krishnaRadha                    culture-figures.jpg         Gods/Figures/Traditional art
+rajuPhoto                       artist-profile.jpg          Photo of Raju (The Artist)
+logo                            logo.png                    Website Logo (Transparent background)
+
+--------------------------
+INSTRUCTIONS:
+1. Paste your .jpg/.png files here.
+2. Rename them to match the "Suggested Filename" column above for easier organization.
+3. Update `src/constants.ts` to import these files.
