@@ -1,0 +1,67 @@
+[
+    {
+        "event_id": "bbl_2025_01",
+        "event_name": "BBL: Perth Scorchers vs Heat",
+        "poster": "https://images.unsplash.com/photo-1531415074968-036ba1b575da?q=80&w=2070&auto=format&fit=crop",
+        "date_type": "range",
+        "start_date": "2024-12-10", 
+        "end_date": "2025-12-25",
+        "time": {
+            "start": "00:00",
+            "end": "23:59"
+        },
+        "channels": ["WILLOW", "FOX", "SS1"]
+    },
+    {
+        "event_id": "pl_live_01",
+        "event_name": "Premier League: Man City vs Liverpool",
+        "poster": "https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=2186&auto=format&fit=crop",
+        "date_type": "range",
+        "start_date": "2024-12-10",
+        "end_date": "2025-12-30",
+        "time": {
+            "start": "13:30",
+            "end": "17:00"
+        },
+        "channels": ["SS1", "TNT1", "SKY"]
+    },
+    {
+        "event_id": "nba_2025",
+        "event_name": "NBA: Lakers vs Celtics",
+        "poster": "https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=2090&auto=format&fit=crop",
+        "date_type": "range",
+        "start_date": "2024-12-01",
+        "end_date": "2025-12-31",
+        "time": {
+            "start": "19:00",
+            "end": "22:30"
+        },
+        "channels": ["FOX", "ESPN"]
+    },
+    {
+        "event_id": "tennis_open_2025",
+        "event_name": "Australian Open 2025",
+        "poster": "https://images.unsplash.com/photo-1582236371746-adc360c7d4d4?q=80&w=2070&auto=format&fit=crop",
+        "date_type": "fixed",
+        "start_date": "2025-01-13",
+        "end_date": "2025-01-26",
+        "time": {
+            "start": "10:00",
+            "end": "22:00"
+        },
+        "channels": ["ESPN", "EUROSPORT"]
+    },
+    {
+        "event_id": "f1_gp_2025",
+        "event_name": "Formula 1: Monaco Grand Prix",
+        "poster": "https://images.unsplash.com/photo-1550993077-3e3e3b3c3b0f?q=80&w=2070&auto=format&fit=crop",
+        "date_type": "fixed",
+        "start_date": "2025-05-25",
+        "end_date": "2025-05-25",
+        "time": {
+            "start": "14:00",
+            "end": "16:00"
+        },
+        "channels": ["SKY SPORTS F1", "ESPN"]
+    }
+]

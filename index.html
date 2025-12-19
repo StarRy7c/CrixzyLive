@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiveSports Pro | Automated Streaming Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
+        :root {
+            --primary: #e50914;
+            --surface: #141414;
+            --surface-light: #2f2f2f;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--surface);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #141414; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #444; }
+
+        .live-badge {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.05); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .event-card {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .event-card:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
+        .glass-nav {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-gradient {
+            background: linear-gradient(0deg, var(--surface) 0%, rgba(20,20,20,0) 100%);
+        }
+
+        /* Prevent right click and selection on player */
+        .no-select {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .channel-btn.active {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .hide { display: none !important; }
+    </style>
+</head>
+<body class="no-select">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-nav px-6 py-4 flex justify-between items-center border-b border-white/10">
+        <div class="flex items-center gap-2 cursor-pointer" onclick="router.home()">
+            <div class="bg-red-600 p-1.5 rounded text-white font-black italic text-xl">LS</div>
+            <span class="font-bold text-xl tracking-tighter">LIVE<span class="text-red-600">SPORTS</span></span>
+        </div>
+        <div class="hidden md:flex gap-8 text-sm font-medium">
+            <a href="#" onclick="router.home()" class="hover:text-red-500 transition">Home</a>
+            <a href="#" class="text-gray-400 hover:text-white transition">Schedule</a>
+            <a href="#" class="text-gray-400 hover:text-white transition">Leagues</a>
+            <a href="#" class="text-gray-400 hover:text-white transition">Archive</a>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="p-2 hover:bg-white/10 rounded-full transition"><i class="fa-solid fa-search"></i></button>
+            <div class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center font-bold">U</div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT WRAPPER -->
+    <main id="main-content" class="pt-20">
+        
+        <!-- HOME PAGE SECTION -->
+        <section id="page-home" class="view">
+            <!-- Hero Section -->
+            <div class="relative h-[60vh] md:h-[80vh] w-full overflow-hidden">
+                <img id="hero-img" src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=2070&auto=format&fit=crop" class="w-full h-full object-cover" alt="Hero">
+                <div class="absolute inset-0 hero-gradient flex flex-col justify-end p-8 md:p-16">
+                    <div class="mb-4 inline-flex items-center gap-2 bg-red-600/20 text-red-500 px-3 py-1 rounded-full text-xs font-bold border border-red-600/30">
+                        <span class="w-2 h-2 bg-red-600 rounded-full live-badge"></span> FEATURED LIVE
+                    </div>
+                    <h1 class="text-4xl md:text-7xl font-extrabold mb-4 max-w-4xl tracking-tighter" id="hero-title">Champions League: Live Stream</h1>
+                    <p class="text-gray-300 text-lg mb-8 max-w-2xl hidden md:block">Experience the thrill of the game in high definition. Auto-scheduled events from across the globe, right at your fingertips.</p>
+                    <div class="flex gap-4">
+                        <button onclick="router.play('bbl_2025_01')" class="bg-white text-black px-8 py-3 rounded font-bold hover:bg-gray-200 flex items-center gap-2">
+                            <i class="fa-solid fa-play"></i> Watch Now
+                        </button>
+                        <button class="bg-white/20 backdrop-blur-sm text-white px-8 py-3 rounded font-bold hover:bg-white/30 flex items-center gap-2 border border-white/20">
+                            <i class="fa-solid fa-circle-info"></i> More Info
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Events Carousel -->
+            <div class="px-8 md:px-16 -mt-20 relative z-20 pb-20">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold">Live Events</h2>
+                        <p class="text-gray-400 text-sm">Happening right now</p>
+                    </div>
+                    <div id="status-clock" class="text-xs text-gray-500 font-mono tracking-widest">
+                        SYNCING CLOCK...
+                    </div>
+                </div>
+
+                <div id="events-grid" class="flex gap-4 overflow-x-auto pb-8 snap-x no-scrollbar">
+                    <!-- Events will be injected here via JS -->
+                    <div id="no-events-msg" class="w-full text-center py-20 bg-white/5 rounded-xl border border-dashed border-white/10 hide">
+                        <i class="fa-solid fa-calendar-xmark text-4xl text-gray-600 mb-4 block"></i>
+                        <h3 class="text-xl font-semibold text-gray-400">No Live Events Currently</h3>
+                        <p class="text-gray-500">Check back later when matches are scheduled.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PLAYER PAGE SECTION -->
+        <section id="page-player" class="view hide min-h-screen px-4 md:px-16 pb-20">
+            <button onclick="router.home()" class="mb-6 flex items-center gap-2 text-gray-400 hover:text-white transition py-4">
+                <i class="fa-solid fa-arrow-left"></i> Back to Home
+            </button>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Video Area -->
+                <div class="lg:col-span-2">
+                    <div class="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+                        <iframe id="main-player" class="absolute inset-0 w-full h-full" 
+                            frameborder="0" allow="autoplay; encrypted-media" allowfullscreen
+                            src=""></iframe>
+                        
+                        <!-- Loading Overlay -->
+                        <div id="player-loader" class="absolute inset-0 bg-black flex items-center justify-center hide">
+                            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8">
+                        <div class="flex items-center gap-4 mb-2">
+                            <span class="bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded live-badge">LIVE</span>
+                            <span id="player-event-id" class="text-gray-500 text-xs font-mono uppercase"></span>
+                        </div>
+                        <h2 id="player-event-title" class="text-3xl font-bold mb-4 tracking-tight"></h2>
+                        <div class="flex items-center gap-6 text-gray-400 text-sm">
+                            <span><i class="fa-solid fa-clock mr-2"></i> <span id="player-event-time"></span></span>
+                            <span><i class="fa-solid fa-users mr-2"></i> 14.2k Watching</span>
+                            <span><i class="fa-solid fa-signal mr-2"></i> 1080p Ultra HD</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Channels & Sidebar -->
+                <div class="bg-white/5 rounded-xl border border-white/10 p-6 flex flex-col">
+                    <h3 class="text-xl font-bold mb-6 border-b border-white/10 pb-4">Available Channels</h3>
+                    
+                    <div id="channel-list" class="flex flex-col gap-3">
+                        <!-- Channels injected here -->
+                    </div>
+
+                    <div class="mt-auto pt-8">
+                        <div class="bg-blue-600/10 border border-blue-600/20 p-4 rounded-lg">
+                            <h4 class="text-blue-400 font-bold text-sm mb-1"><i class="fa-solid fa-circle-info mr-2"></i> Stream Tips</h4>
+                            <p class="text-xs text-blue-200/70">If the stream doesn't load, try switching to a different channel or check your internet connection.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-white/10 bg-black py-12 px-8 text-center text-gray-500">
+        <div class="flex justify-center gap-6 mb-8 text-xl">
+            <a href="#" class="hover:text-white"><i class="fa-brands fa-twitter"></i></a>
+            <a href="#" class="hover:text-white"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" class="hover:text-white"><i class="fa-brands fa-youtube"></i></a>
+        </div>
+        <p class="text-xs uppercase tracking-widest">&copy; 2025 LiveSports Pro. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        /**
+         * 1. DATA MOCKING
+         * We define these as objects to mimic the events.json and streams.json 
+         * files while staying in a single-file portable environment.
+         */
+        
+        const eventsData = [
+            {
+                "event_id": "bbl_2025_01",
+                "event_name": "BBL: Perth Scorchers vs Heat",
+                "poster": "https://images.unsplash.com/photo-1531415074968-036ba1b575da?q=80&w=2070&auto=format&fit=crop",
+                "date_type": "range",
+                "start_date": "2024-12-10", 
+                "end_date": "2025-12-25",
+                "time": {
+                    "start": "00:00",
+                    "end": "23:59"
+                },
+                "channels": ["WILLOW", "FOX", "SS1"]
+            },
+            {
+                "event_id": "pl_live_01",
+                "event_name": "Premier League: Man City vs Liverpool",
+                "poster": "https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=2186&auto=format&fit=crop",
+                "date_type": "range",
+                "start_date": "2024-12-10",
+                "end_date": "2025-12-30",
+                "time": {
+                    "start": "13:30",
+                    "end": "17:00"
+                },
+                "channels": ["SS1", "TNT1", "SKY"]
+            },
+            {
+                "event_id": "nba_2025",
+                "event_name": "NBA: Lakers vs Celtics",
+                "poster": "https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=2090&auto=format&fit=crop",
+                "date_type": "range",
+                "start_date": "2024-12-01",
+                "end_date": "2025-12-31",
+                "time": {
+                    "start": "19:00",
+                    "end": "22:30"
+                },
+                "channels": ["FOX", "ESPN"]
+            }
+        ];
+
+        const streamsData = {
+            "WILLOW": { "name": "Willow Cricket", "iframe": "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" },
+            "FOX": { "name": "Fox Sports", "iframe": "https://www.youtube.com/embed/ScMzIvxBSi4?autoplay=1" },
+            "SS1": { "name": "Sky Sports 1", "iframe": "https://www.youtube.com/embed/9bZkp7q19f0?autoplay=1" },
+            "TNT1": { "name": "TNT Sports 1", "iframe": "https://www.youtube.com/embed/5NV6Rdv1a3I?autoplay=1" },
+            "SKY": { "name": "Sky HD", "iframe": "https://www.youtube.com/embed/LXb3EKWsInQ?autoplay=1" },
+            "ESPN": { "name": "ESPN+", "iframe": "https://www.youtube.com/embed/jNQXAC9IVRw?autoplay=1" }
+        };
+
+        /**
+         * 2. ROUTING LOGIC
+         */
+        const router = {
+            currentEvent: null,
+            
+            home: function() {
+                document.getElementById('page-home').classList.remove('hide');
+                document.getElementById('page-player').classList.add('hide');
+                document.getElementById('main-player').src = "";
+                window.scrollTo(0,0);
+            },
+            
+            play: function(eventId) {
+                const event = eventsData.find(e => e.event_id === eventId);
+                if (!event) return;
+
+                this.currentEvent = event;
+                
+                // Switch View
+                document.getElementById('page-home').classList.add('hide');
+                document.getElementById('page-player').classList.remove('hide');
+                
+                // Update Metadata
+                document.getElementById('player-event-id').innerText = event.event_id;
+                document.getElementById('player-event-title').innerText = event.event_name;
+                document.getElementById('player-event-time').innerText = `${event.time.start} - ${event.time.end}`;
+                
+                // Load Channels
+                const channelList = document.getElementById('channel-list');
+                channelList.innerHTML = '';
+                
+                event.channels.forEach((chId, index) => {
+                    const stream = streamsData[chId];
+                    if (!stream) return;
+                    
+                    const btn = document.createElement('button');
+                    btn.className = `channel-btn flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition text-left ${index === 0 ? 'active' : ''}`;
+                    btn.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded bg-white/10 flex items-center justify-center font-bold text-xs">${chId}</div>
+                            <span class="font-medium">${stream.name}</span>
+                        </div>
+                        <i class="fa-solid fa-play text-xs opacity-50"></i>
+                    `;
+                    btn.onclick = () => this.switchChannel(chId, btn);
+                    channelList.appendChild(btn);
+                    
+                    // Default to first channel
+                    if (index === 0) this.switchChannel(chId, btn);
+                });
+
+                window.scrollTo(0,0);
+            },
+
+            switchChannel: function(chId, btnElement) {
+                const stream = streamsData[chId];
+                if (!stream) return;
+
+                // UI feedback
+                document.querySelectorAll('.channel-btn').forEach(b => b.classList.remove('active'));
+                btnElement.classList.add('active');
+
+                // Loader
+                const loader = document.getElementById('player-loader');
+                loader.classList.remove('hide');
+                
+                const iframe = document.getElementById('main-player');
+                
+                // In a real app, you might obfuscate this or use a tokenized URL
+                const b64Url = stream.iframe; 
+                iframe.src = b64Url;
+
+                iframe.onload = () => {
+                    loader.classList.add('hide');
+                };
+            }
+        };
+
+        /**
+         * 3. SCHEDULER LOGIC
+         */
+        const Scheduler = {
+            isActive: function(event) {
+                const now = new Date();
+                
+                // Format current time as HH:MM
+                const curHH = now.getHours().toString().padStart(2, '0');
+                const curMM = now.getMinutes().toString().padStart(2, '0');
+                const currentTime = `${curHH}:${curMM}`;
+                
+                // Current Date string YYYY-MM-DD
+                const currentDate = now.toISOString().split('T')[0];
+
+                // 1. Date Check
+                let isDateValid = false;
+                if (event.date_type === "range") {
+                    isDateValid = currentDate >= event.start_date && currentDate <= event.end_date;
+                } else if (event.specific_dates) {
+                    isDateValid = event.specific_dates.includes(currentDate);
+                }
+
+                // 2. Time Check
+                const isTimeValid = currentTime >= event.time.start && currentTime <= event.time.end;
+
+                return isDateValid && isTimeValid;
+            },
+
+            updateUI: function() {
+                const grid = document.getElementById('events-grid');
+                const noEventsMsg = document.getElementById('no-events-msg');
+                const currentEvents = eventsData.filter(this.isActive);
+
+                // Update clock
+                const now = new Date();
+                document.getElementById('status-clock').innerText = `SYSTEM TIME: ${now.toLocaleTimeString()}`;
+
+                // Check if current player event expired
+                if (router.currentEvent && !this.isActive(router.currentEvent)) {
+                    // Logic to handle expiration while watching
+                    // router.home(); 
+                    // Optional: show a message "This event has ended"
+                }
+
+                // Render Grid
+                // Only re-render if count changed or grid is empty
+                const existingCardIds = Array.from(grid.querySelectorAll('.event-card')).map(c => c.dataset.id);
+                const currentIds = currentEvents.map(e => e.event_id);
+
+                if (JSON.stringify(existingCardIds) !== JSON.stringify(currentIds)) {
+                    // Clear and re-populate
+                    grid.innerHTML = '';
+                    
+                    if (currentEvents.length === 0) {
+                        grid.appendChild(noEventsMsg);
+                        noEventsMsg.classList.remove('hide');
+                    } else {
+                        noEventsMsg.classList.add('hide');
+                        currentEvents.forEach(event => {
+                            const card = document.createElement('div');
+                            card.className = "event-card flex-shrink-0 w-[280px] md:w-[350px] snap-start cursor-pointer group dataset-id";
+                            card.dataset.id = event.event_id;
+                            card.onclick = () => router.play(event.event_id);
+                            
+                            card.innerHTML = `
+                                <div class="relative aspect-video rounded-xl overflow-hidden mb-3 ring-1 ring-white/10 shadow-lg">
+                                    <img src="${event.poster}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="${event.event_name}">
+                                    <div class="absolute top-3 left-3 flex gap-2">
+                                        <span class="bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded live-badge uppercase">LIVE</span>
+                                        <span class="bg-black/60 backdrop-blur text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">HD</span>
+                                    </div>
+                                    <div class="absolute bottom-3 right-3 bg-black/60 backdrop-blur text-white text-[10px] px-2 py-0.5 rounded font-mono">
+                                        ${event.time.start} - ${event.time.end}
+                                    </div>
+                                </div>
+                                <h4 class="font-bold text-lg leading-tight group-hover:text-red-500 transition">${event.event_name}</h4>
+                                <p class="text-gray-500 text-xs mt-1 uppercase tracking-wider">${event.channels.join(' • ')}</p>
+                            `;
+                            grid.appendChild(card);
+                        });
+                    }
+                }
+            }
+        };
+
+        /**
+         * INITIALIZATION
+         */
+        window.onload = function() {
+            // Start scheduler
+            Scheduler.updateUI();
+            
+            // Set interval for live detection every 30 seconds
+            setInterval(() => {
+                Scheduler.updateUI();
+            }, 30000);
+
+            // Prevent right-click on the whole document for "protection"
+            document.addEventListener('contextmenu', event => event.preventDefault());
+            
+            // Handle player page key shortcuts
+            document.addEventListener('keydown', (e) => {
+                if(e.key === "Escape") router.home();
+            });
+        };
+    </script>
+</body>
+</html>
