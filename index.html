@@ -69,6 +69,10 @@
         }
 
         .hide { display: none !important; }
+        
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
     </style>
 </head>
 <body class="no-select">
@@ -106,7 +110,7 @@
                     <h1 class="text-4xl md:text-7xl font-extrabold mb-4 max-w-4xl tracking-tighter" id="hero-title">Champions League: Live Stream</h1>
                     <p class="text-gray-300 text-lg mb-8 max-w-2xl hidden md:block">Experience the thrill of the game in high definition. Auto-scheduled events from across the globe, right at your fingertips.</p>
                     <div class="flex gap-4">
-                        <button onclick="router.play('bbl_2025_01')" class="bg-white text-black px-8 py-3 rounded font-bold hover:bg-gray-200 flex items-center gap-2">
+                        <button onclick="router.playFirstLive()" class="bg-white text-black px-8 py-3 rounded font-bold hover:bg-gray-200 flex items-center gap-2">
                             <i class="fa-solid fa-play"></i> Watch Now
                         </button>
                         <button class="bg-white/20 backdrop-blur-sm text-white px-8 py-3 rounded font-bold hover:bg-white/30 flex items-center gap-2 border border-white/20">
@@ -123,7 +127,7 @@
                         <h2 class="text-2xl font-bold">Live Events</h2>
                         <p class="text-gray-400 text-sm">Happening right now</p>
                     </div>
-                    <div id="status-clock" class="text-xs text-gray-500 font-mono tracking-widest">
+                    <div id="status-clock" class="text-xs text-gray-500 font-mono tracking-widest uppercase">
                         SYNCING CLOCK...
                     </div>
                 </div>
@@ -204,61 +208,34 @@
 
     <script>
         /**
-         * 1. DATA MOCKING
-         * We define these as objects to mimic the events.json and streams.json 
-         * files while staying in a single-file portable environment.
+         * 1. DATA MANAGEMENT
+         * Replaced static objects with fetch calls to load your local JSON files.
          */
-        
-        const eventsData = [
-            {
-                "event_id": "bbl_2025_01",
-                "event_name": "BBL: Perth Scorchers vs Heat",
-                "poster": "https://images.unsplash.com/photo-1531415074968-036ba1b575da?q=80&w=2070&auto=format&fit=crop",
-                "date_type": "range",
-                "start_date": "2024-12-10", 
-                "end_date": "2025-12-25",
-                "time": {
-                    "start": "00:00",
-                    "end": "23:59"
-                },
-                "channels": ["WILLOW", "FOX", "SS1"]
-            },
-            {
-                "event_id": "pl_live_01",
-                "event_name": "Premier League: Man City vs Liverpool",
-                "poster": "https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=2186&auto=format&fit=crop",
-                "date_type": "range",
-                "start_date": "2024-12-10",
-                "end_date": "2025-12-30",
-                "time": {
-                    "start": "13:30",
-                    "end": "17:00"
-                },
-                "channels": ["SS1", "TNT1", "SKY"]
-            },
-            {
-                "event_id": "nba_2025",
-                "event_name": "NBA: Lakers vs Celtics",
-                "poster": "https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=2090&auto=format&fit=crop",
-                "date_type": "range",
-                "start_date": "2024-12-01",
-                "end_date": "2025-12-31",
-                "time": {
-                    "start": "19:00",
-                    "end": "22:30"
-                },
-                "channels": ["FOX", "ESPN"]
-            }
-        ];
+        let eventsData = [];
+        let streamsData = {};
 
-        const streamsData = {
-            "WILLOW": { "name": "Willow Cricket", "iframe": "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" },
-            "FOX": { "name": "Fox Sports", "iframe": "https://www.youtube.com/embed/ScMzIvxBSi4?autoplay=1" },
-            "SS1": { "name": "Sky Sports 1", "iframe": "https://www.youtube.com/embed/9bZkp7q19f0?autoplay=1" },
-            "TNT1": { "name": "TNT Sports 1", "iframe": "https://www.youtube.com/embed/5NV6Rdv1a3I?autoplay=1" },
-            "SKY": { "name": "Sky HD", "iframe": "https://www.youtube.com/embed/LXb3EKWsInQ?autoplay=1" },
-            "ESPN": { "name": "ESPN+", "iframe": "https://www.youtube.com/embed/jNQXAC9IVRw?autoplay=1" }
-        };
+        async function loadAppData() {
+            try {
+                const [eventsRes, streamsRes] = await Promise.all([
+                    fetch('data/events.json'),
+                    fetch('data/streams.json')
+                ]);
+
+                if (!eventsRes.ok || !streamsRes.ok) {
+                    throw new Error("Failed to load JSON files. Make sure they are in the 'data/' folder.");
+                }
+
+                eventsData = await eventsRes.json();
+                streamsData = await streamsRes.json();
+
+                // Initial UI Build
+                Scheduler.updateUI();
+                console.log("Data loaded successfully.");
+            } catch (err) {
+                console.error("Initialization Error:", err);
+                document.getElementById('status-clock').innerText = "ERROR LOADING DATA";
+            }
+        }
 
         /**
          * 2. ROUTING LOGIC
@@ -270,7 +247,12 @@
                 document.getElementById('page-home').classList.remove('hide');
                 document.getElementById('page-player').classList.add('hide');
                 document.getElementById('main-player').src = "";
-                window.scrollTo(0,0);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            },
+
+            playFirstLive: function() {
+                const live = eventsData.find(e => Scheduler.isActive(e));
+                if (live) this.play(live.event_id);
             },
             
             play: function(eventId) {
@@ -301,7 +283,7 @@
                     btn.innerHTML = `
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 rounded bg-white/10 flex items-center justify-center font-bold text-xs">${chId}</div>
-                            <span class="font-medium">${stream.name}</span>
+                            <span class="font-medium">${chId} Stream</span>
                         </div>
                         <i class="fa-solid fa-play text-xs opacity-50"></i>
                     `;
@@ -312,12 +294,12 @@
                     if (index === 0) this.switchChannel(chId, btn);
                 });
 
-                window.scrollTo(0,0);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             },
 
             switchChannel: function(chId, btnElement) {
                 const stream = streamsData[chId];
-                if (!stream) return;
+                if (!stream || !stream.iframe) return;
 
                 // UI feedback
                 document.querySelectorAll('.channel-btn').forEach(b => b.classList.remove('active'));
@@ -328,10 +310,7 @@
                 loader.classList.remove('hide');
                 
                 const iframe = document.getElementById('main-player');
-                
-                // In a real app, you might obfuscate this or use a tokenized URL
-                const b64Url = stream.iframe; 
-                iframe.src = b64Url;
+                iframe.src = stream.iframe;
 
                 iframe.onload = () => {
                     loader.classList.add('hide');
@@ -377,20 +356,11 @@
                 const now = new Date();
                 document.getElementById('status-clock').innerText = `SYSTEM TIME: ${now.toLocaleTimeString()}`;
 
-                // Check if current player event expired
-                if (router.currentEvent && !this.isActive(router.currentEvent)) {
-                    // Logic to handle expiration while watching
-                    // router.home(); 
-                    // Optional: show a message "This event has ended"
-                }
-
                 // Render Grid
-                // Only re-render if count changed or grid is empty
                 const existingCardIds = Array.from(grid.querySelectorAll('.event-card')).map(c => c.dataset.id);
                 const currentIds = currentEvents.map(e => e.event_id);
 
                 if (JSON.stringify(existingCardIds) !== JSON.stringify(currentIds)) {
-                    // Clear and re-populate
                     grid.innerHTML = '';
                     
                     if (currentEvents.length === 0) {
@@ -400,13 +370,13 @@
                         noEventsMsg.classList.add('hide');
                         currentEvents.forEach(event => {
                             const card = document.createElement('div');
-                            card.className = "event-card flex-shrink-0 w-[280px] md:w-[350px] snap-start cursor-pointer group dataset-id";
+                            card.className = "event-card flex-shrink-0 w-[280px] md:w-[350px] snap-start cursor-pointer group";
                             card.dataset.id = event.event_id;
                             card.onclick = () => router.play(event.event_id);
                             
                             card.innerHTML = `
                                 <div class="relative aspect-video rounded-xl overflow-hidden mb-3 ring-1 ring-white/10 shadow-lg">
-                                    <img src="${event.poster}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="${event.event_name}">
+                                    <img src="${event.poster}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="${event.event_name}" onerror="this.src='https://images.unsplash.com/photo-1504450758481-7338eba7524a?q=80&w=400&auto=format&fit=crop'">
                                     <div class="absolute top-3 left-3 flex gap-2">
                                         <span class="bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded live-badge uppercase">LIVE</span>
                                         <span class="bg-black/60 backdrop-blur text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">HD</span>
@@ -429,19 +399,23 @@
          * INITIALIZATION
          */
         window.onload = function() {
-            // Start scheduler
-            Scheduler.updateUI();
+            // Load External JSON files
+            loadAppData();
             
-            // Set interval for live detection every 30 seconds
+            // Set interval for live detection every 60 seconds (as per requirement)
             setInterval(() => {
                 Scheduler.updateUI();
-            }, 30000);
+            }, 60000);
 
-            // Prevent right-click on the whole document for "protection"
+            // Security: Prevent right-click and selection
             document.addEventListener('contextmenu', event => event.preventDefault());
             
-            // Handle player page key shortcuts
             document.addEventListener('keydown', (e) => {
+                // F12 / Ctrl+Shift+I prevention (basic)
+                if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73)) {
+                    e.preventDefault();
+                    return false;
+                }
                 if(e.key === "Escape") router.home();
             });
         };
