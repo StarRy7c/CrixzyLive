@@ -2,7 +2,7 @@
     {
         "event_id": "bbl_2025_01",
         "event_name": "BBL: Perth Scorchers vs Heat",
-        "poster": "https://images.unsplash.com/photo-1531415074968-036ba1b575da?q=80&w=2070&auto=format&fit=crop",
+        "poster": "IMG_20251213_23595274.jpeg?q=80&w=2070&auto=format&fit=crop",
         "date_type": "range",
         "start_date": "2024-12-10", 
         "end_date": "2025-12-25",
@@ -15,7 +15,7 @@
     {
         "event_id": "pl_live_01",
         "event_name": "Premier League: Man City vs Liverpool",
-        "poster": "https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=2186&auto=format&fit=crop",
+        "poster": "IMG_20251213_23595984.jpeg?q=80&w=2186&auto=format&fit=crop",
         "date_type": "range",
         "start_date": "2024-12-10",
         "end_date": "2025-12-30",
