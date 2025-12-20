@@ -1,20 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Live Sports</title>
-<link rel="stylesheet" href="assets/css/style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProStream | Live Sports</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #0f0f0f; color: white; font-family: 'Inter', sans-serif; }
+        .live-badge { animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        .hide { display: none; }
+        .event-card:hover { transform: scale(1.03); transition: 0.3s ease; }
+    </style>
 </head>
 <body>
 
+    <header class="p-6 flex justify-between items-center border-b border-gray-800">
+        <h1 class="text-2xl font-black tracking-tighter text-red-600">PRO<span class="text-white">STREAM</span></h1>
+        <div id="clock" class="text-sm font-mono text-gray-400">00:00:00</div>
+    </header>
 
-<header>🔴 Live Sports Now</header>
+    <main class="p-6 md:p-12">
+        <div class="flex items-center gap-2 mb-8">
+            <div class="w-3 h-3 bg-red-600 rounded-full live-badge"></div>
+            <h2 class="text-xl font-bold uppercase tracking-widest">Live Events</h2>
+        </div>
 
+        <div id="event-container" class="flex overflow-x-auto gap-6 pb-6 no-scrollbar">
+            <div id="loader" class="text-gray-500">Checking for live streams...</div>
+        </div>
 
-<section class="slider" id="liveEvents"></section>
+        <div id="no-events" class="hide text-center py-20">
+            <p class="text-gray-500 text-lg">No events currently live. Check back later!</p>
+        </div>
+    </main>
 
+    <script>
+        async function initLiveEngine() {
+            try {
+                const response = await fetch('events.json');
+                const events = await response.json();
+                renderEvents(events);
+            } catch (err) {
+                console.error("Failed to load events:", err);
+            }
+        }
 
-<script src="js/home.js"></script>
+        function isLive(event) {
+            const now = new Date();
+            const todayStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
+            const currentTime = now.getHours() * 60 + now.getMinutes();
+            
+            const [startH, startM] = event.time.start.split(':').map(Number);
+            const [endH, endM] = event.time.end.split(':').map(Number);
+            const startTime = startH * 60 + startM;
+            const endTime = endH * 60 + endM;
+
+            let dateMatch = false;
+
+            if (event.date_type === "specific") {
+                dateMatch = event.specific_dates.includes(todayStr);
+            } else {
+                dateMatch = todayStr >= event.start_date && todayStr <= event.end_date;
+            }
+
+            const timeMatch = currentTime >= startTime && currentTime <= endTime;
+
+            return dateMatch && timeMatch;
+        }
+
+        function renderEvents(events) {
+            const container = document.getElementById('event-container');
+            const noEventsMsg = document.getElementById('no-events');
+            container.innerHTML = '';
+            
+            const liveEvents = events.filter(isLive);
+
+            if (liveEvents.length === 0) {
+                noEventsMsg.classList.remove('hide');
+                return;
+            }
+
+            noEventsMsg.classList.add('hide');
+
+            liveEvents.forEach(event => {
+                const card = `
+                    <div class="event-card min-w-[300px] md:min-w-[400px] bg-zinc-900 rounded-xl overflow-hidden cursor-pointer shadow-2xl relative" 
+                         onclick="location.href='player.html?id=${event.event_id}'">
+                        <img src="${event.poster}" class="w-full h-56 object-cover opacity-70" alt="${event.event_name}">
+                        <div class="absolute top-4 left-4 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded">🔴 LIVE</div>
+                        <div class="p-5">
+                            <h3 class="text-lg font-bold truncate">${event.event_name}</h3>
+                            <p class="text-xs text-gray-400 mt-1">Air Time: ${event.time.start} - ${event.time.end} (GMT)</p>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+        }
+
+        // Auto-refresh every 60 seconds
+        setInterval(initLiveEngine, 60000);
+        initLiveEngine();
+
+        // Simple Clock
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+        }, 1000);
+    </script>
 </body>
 </html>
