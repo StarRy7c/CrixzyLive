@@ -1,18 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Player</title>
-  <link rel="stylesheet" href="assets/css/style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playing Stream | ProStream</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #050505; color: white; }
+        .aspect-video-container { position: relative; padding-bottom: 56.25%; height: 0; }
+        .aspect-video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        .active-btn { background: #dc2626 !important; border-color: #dc2626; }
+        #overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+    </style>
 </head>
-<body oncontextmenu="return false">
+<body oncontextmenu="return false;"> <div class="max-w-6xl mx-auto p-4 md:p-8">
+        <button onclick="history.back()" class="text-gray-400 hover:text-white mb-6">← Back to Home</button>
 
-<div class="player-container">
-  <iframe id="player"></iframe>
-  <div class="channel-buttons" id="channels"></div>
-</div>
+        <div id="player-wrapper" class="bg-black rounded-2xl overflow-hidden shadow-2xl ring-1 ring-gray-800">
+            <div class="aspect-video-container">
+                <iframe id="main-player" src="about:blank" allowfullscreen scrolling="no"></iframe>
+                <div id="overlay"></div>
+            </div>
+        </div>
 
-<script src="js/player.js"></script>
+        <div class="mt-8">
+            <h1 id="event-title" class="text-2xl font-bold">Loading...</h1>
+            <p class="text-gray-500 mt-2 uppercase tracking-widest text-xs font-bold">Select Channel</p>
+            
+            <div id="channel-list" class="flex flex-wrap gap-3 mt-4">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = urlParams.get('id');
+
+        async function loadPlayer() {
+            const [resEvents, resStreams] = await Promise.all([
+                fetch('events.json'),
+                fetch('streams.json')
+            ]);
+            
+            const events = await resEvents.json();
+            const streams = await resStreams.json();
+
+            const currentEvent = events.find(e => e.event_id === eventId);
+            
+            if (!currentEvent) {
+                document.body.innerHTML = "<div class='text-center mt-20 text-red-500 font-bold'>ERROR: Event not found or expired.</div>";
+                return;
+            }
+
+            document.getElementById('event-title').innerText = currentEvent.event_name;
+            const channelContainer = document.getElementById('channel-list');
+
+            currentEvent.channels.forEach((chKey, index) => {
+                const streamData = streams[chKey];
+                if (!streamData) return;
+
+                const btn = document.createElement('button');
+                btn.className = "px-6 py-3 bg-zinc-800 border border-zinc-700 rounded-lg font-bold text-sm transition-all hover:bg-zinc-700";
+                btn.innerText = chKey;
+                
+                // Set first channel as default
+                if (index === 0) {
+                    btn.classList.add('active-btn');
+                    document.getElementById('main-player').src = streamData.iframe;
+                }
+
+                btn.onclick = () => {
+                    // Update Iframe
+                    document.getElementById('main-player').src = streamData.iframe;
+                    // Update Active Style
+                    document.querySelectorAll('#channel-list button').forEach(b => b.classList.remove('active-btn'));
+                    btn.classList.add('active-btn');
+                };
+
+                channelContainer.appendChild(btn);
+            });
+        }
+
+        // Prevent some interactions
+        document.addEventListener('dragstart', (e) => e.preventDefault());
+
+        loadPlayer();
+    </script>
 </body>
 </html>
