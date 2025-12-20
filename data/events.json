@@ -10,7 +10,7 @@
 "start": "00:01",
 "end": "17:00"
 },
-"channels": ["WILLOW", "FOX", "SS1"]
+"channels": ["WILLOW", "tnt2" "FOX", "SS1"]
 },
 {
 "event_id": "pl_live_01",
