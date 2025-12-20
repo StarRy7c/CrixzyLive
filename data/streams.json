@@ -1,24 +1,6 @@
 {
-    "WILLOW": { "name": "Willow Cricket", "iframe": "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" },
-    "FOX": { "name": "Fox Sports", "iframe": "https://www.youtube.com/embed/ScMzIvxBSi4?autoplay=1" },
-    "SS1": { "name": "Sky Sports 1", "iframe": "https://www.youtube.com/embed/9bZkp7q19f0?autoplay=1" },
-    "TNT1": { "name": "TNT Sports 1", "iframe": "https://starry7c.github.io/TNT1" },
-     "tnt2": { "name": "TNT Sports 2", "iframe": "https://starry7c.github.io/tnt2" },
-    "tnt3": { "name": "TNT Sports 3", "iframe": "https://starry7c.github.io/tnt3/" },
-    "SKY": { "name": "Sky HD", "iframe": "https://www.youtube.com/embed/LXb3EKWsInQ?autoplay=1" },
-    "ESPN": { "name": "ESPN+", "iframe": "https://www.youtube.com/embed/jNQXAC9IVRw?autoplay=1" },
-    "EUROSPORT": { "name": "Eurosport", "iframe": "https://www.youtube.com/embed/some_euro_url_1?autoplay=1" },
-    "NBC": { "name": "NBC Sports", "iframe": "https://www.youtube.com/embed/some_nbc_url_2?autoplay=1" },
-    "CBS": { "name": "CBS Sports", "iframe": "https://www.youtube.com/embed/some_cbs_url_3?autoplay=1" },
-    "ABC": { "name": "ABC Sports", "iframe": "https://www.youtube.com/embed/some_abc_url_4?autoplay=1" },
-    "BEIN": { "name": "beIN Sports", "iframe": "https://www.youtube.com/embed/some_bein_url_5?autoplay=1" },
-    "BT_SPORT": { "name": "BT Sport", "iframe": "https://www.youtube.com/embed/some_bt_url_6?autoplay=1" },
-    "DAZN": { "name": "DAZN", "iframe": "https://www.youtube.com/embed/some_dazn_url_7?autoplay=1" },
-    "TSN": { "name": "TSN Canada", "iframe": "https://www.youtube.com/embed/some_tsn_url_8?autoplay=1" },
-    "SPORTSNET": { "name": "Sportsnet", "iframe": "https://www.youtube.com/embed/some_snet_url_9?autoplay=1" },
-    "GOL_TV": { "name": "GolTV", "iframe": "https://www.youtube.com/embed/some_goltv_url_10?autoplay=1" },
-    "CABLE_SPORT": { "name": "Cable Sports", "iframe": "https://www.youtube.com/embed/some_cable_url_11?autoplay=1" },
-    "PREMIER_SPORT": { "name": "Premier Sports", "iframe": "https://www.youtube.com/embed/some_premier_url_12?autoplay=1" },
-    "ARENA_SPORT": { "name": "Arena Sport", "iframe": "https://www.youtube.com/embed/some_arena_url_13?autoplay=1" },
-    "SPORT_TV": { "name": "Sport TV", "iframe": "https://www.youtube.com/embed/some_sporttv_url_14?autoplay=1" }
+"WILLOW": { "iframe": "https://example.com/willow" },
+"FOX": { "iframe": "https://example.com/fox" },
+"SS1": { "iframe": "https://example.com/ss1" },
+"TNT1": { "iframe": "https://starry7c.github.io/TNT1" }
 }
