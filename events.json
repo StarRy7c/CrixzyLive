@@ -1,0 +1,27 @@
+[
+  {
+    "event_id": "bbl_2025_01",
+    "event_name": "BBL LIVE: SEASON 2025",
+    "poster": "https://placehold.co/600x400/1e1e1e/white?text=BBL+CRICKET",
+    "date_type": "range",
+    "start_date": "2025-12-10",
+    "end_date": "2025-12-30",
+    "time": {
+      "start": "13:30",
+      "end": "22:00"
+    },
+    "channels": ["WILLOW", "FOX", "SS1"]
+  },
+  {
+    "event_id": "pl_2025_02",
+    "event_name": "PREMIER LEAGUE LIVE",
+    "poster": "https://placehold.co/600x400/003d29/white?text=PREMIER+LEAGUE",
+    "date_type": "specific",
+    "specific_dates": ["2025-12-20", "2025-12-21"],
+    "time": {
+      "start": "18:00",
+      "end": "23:59"
+    },
+    "channels": ["SS1", "TNT1"]
+  }
+]
