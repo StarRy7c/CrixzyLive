@@ -1,28 +1,21 @@
 [
 {
 "event_id": "bbl_2025_01",
-"event_name": "BBL: Perth Scorchers vs Heat",
-"poster": "IMG_20251213_23595984.jpeg",
+"event_name": "BBL LIVE",
+"poster": "IMG_20251213_23595274.jpeg",
+
+
 "date_type": "range",
 "start_date": "2025-12-10",
 "end_date": "2025-12-25",
-"time": {
-"start": "00:01",
-"end": "17:00"
-},
-"channels": ["WILLOW", "tnt2" "FOX", "SS1"]
-},
-{
-"event_id": "pl_live_01",
-"event_name": "Premier League: Man City vs Liverpool",
-"poster": "IMG_20251213_23595984.jpeg",
-"date_type": "range",
-"start_date": "2025-12-10",
-"end_date": "2025-12-30",
+
+
 "time": {
 "start": "13:30",
 "end": "17:00"
 },
-"channels": ["SS1", "TNT1", "SKY"]
+
+
+"channels": ["WILLOW", "FOX", "SS1", "TNT1"]
 }
 ]
