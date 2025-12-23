@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Live Sports Hub</title>
+
+  <!-- Tailwind CDN: no build required -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['ui-sans-serif', 'system-ui', 'Segoe UI', 'Roboto', 'Arial'] }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+
+<body class="min-h-screen bg-zinc-950 text-zinc-100">
+
+  <!-- TOP BAR -->
+  <header class="sticky top-0 z-50 backdrop-blur bg-black/55 border-b border-white/10">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-orange-400 grid place-items-center shadow-lg">
+          <span class="font-black text-black">LS</span>
+        </div>
+        <div>
+          <div class="text-xl font-extrabold tracking-tight leading-none">Live Sports Hub</div>
+          <div class="text-xs text-zinc-400">Season automation · JSON schedule engine · Static hosting</div>
+        </div>
+      </div>
+
+      <div class="ml-auto flex items-center gap-3">
+        <div class="hidden sm:flex items-center gap-2 text-xs text-zinc-300 bg-white/5 border border-white/10 rounded-xl px-3 py-2">
+          <span class="opacity-70">Local time</span>
+          <span id="clock" class="font-mono"></span>
+        </div>
+
+        <div class="flex items-center gap-2 text-xs text-zinc-300 bg-white/5 border border-white/10 rounded-xl px-3 py-2">
+          <span class="opacity-70">Auto refresh</span>
+          <span id="refreshIn" class="font-mono">--</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="max-w-6xl mx-auto px-4 pt-8 pb-4">
+    <div class="rounded-3xl p-6 sm:p-8 border border-white/10 bg-gradient-to-br from-zinc-900 to-black overflow-hidden relative">
+      <div class="absolute inset-0 pointer-events-none opacity-30 hero-noise"></div>
+
+      <div class="grid gap-6 lg:grid-cols-[1.35fr_0.65fr] items-start">
+        <!-- Left -->
+        <div>
+          <div class="inline-flex items-center gap-2 text-xs px-3 py-1 rounded-full bg-red-500/15 border border-red-500/30">
+            <span class="inline-block w-2 h-2 bg-red-500 rounded-full animate-liveDot"></span>
+            <span class="text-red-200">Live detection + countdown enabled</span>
+          </div>
+
+          <h1 class="mt-3 text-3xl sm:text-4xl font-black tracking-tight">
+            Upload once. Run the whole season.
+          </h1>
+          <p class="mt-2 text-zinc-300 max-w-2xl">
+            Events appear only during their live window and vanish automatically after end time.
+            Supports daily ranges, specific dates, and extra occurrences (e.g., 7PM daily + extra 3PM on Dec 15).
+          </p>
+
+          <div class="mt-5 flex flex-col sm:flex-row gap-3">
+            <div class="flex-1">
+              <label class="text-xs text-zinc-400">Search events (live + upcoming)</label>
+              <div class="mt-2 flex items-center gap-2 bg-white/5 border border-white/10 rounded-2xl px-3 py-2">
+                <svg width="18" height="18" viewBox="0 0 24 24" class="opacity-70">
+                  <path fill="currentColor" d="M10 18a8 8 0 1 1 5.293-14.293A8 8 0 0 1 10 18m11 3l-6-6l1.414-1.414l6 6z"/>
+                </svg>
+                <input id="searchInput" class="w-full bg-transparent outline-none text-sm" placeholder="Search (e.g., BBL, IPL)"/>
+                <button id="clearSearch" class="text-xs px-2 py-1 rounded-lg bg-white/10 hover:bg-white/15 border border-white/10">Clear</button>
+              </div>
+            </div>
+
+            <div class="sm:w-[220px]">
+              <label class="text-xs text-zinc-400">Quick actions</label>
+              <div class="mt-2 flex gap-2">
+                <button id="forceRefresh" class="flex-1 px-3 py-2 rounded-xl bg-red-500 hover:bg-red-400 text-black font-extrabold">
+                  Refresh
+                </button>
+                <button id="scrollToTimeline" class="flex-1 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10">
+                  Timeline
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: NEXT UP -->
+        <div class="rounded-3xl border border-white/10 bg-white/5 p-5">
+          <div class="text-sm font-extrabold">Next Up</div>
+          <div id="nextUpName" class="mt-2 text-lg font-black leading-tight">Loading…</div>
+
+          <div class="mt-3 grid grid-cols-2 gap-3">
+            <div class="rounded-2xl bg-black/30 border border-white/10 p-3">
+              <div class="text-xs text-zinc-400">Starts in</div>
+              <div id="nextUpCountdown" class="mt-1 font-mono text-xl font-black">--:--:--</div>
+            </div>
+            <div class="rounded-2xl bg-black/30 border border-white/10 p-3">
+              <div class="text-xs text-zinc-400">Start time</div>
+              <div id="nextUpTime" class="mt-1 text-sm font-extrabold">—</div>
+            </div>
+          </div>
+
+          <a id="nextUpLink" href="#" class="mt-4 block text-center px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10">
+            Open next event
+          </a>
+
+          <p class="mt-3 text-xs text-zinc-400">
+            If no upcoming events are in the look-ahead window, this box will show “No upcoming”.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN -->
+  <main class="max-w-6xl mx-auto px-4 pb-12">
+
+    <!-- LIVE NOW -->
+    <section class="mt-6">
+      <div class="flex items-end justify-between gap-3">
+        <div>
+          <h2 class="text-xl font-extrabold">🔴 Live Now</h2>
+          <p class="text-sm text-zinc-400">Only occurrences currently live. Cards disappear exactly at end time.</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="liveLeft" class="slider-btn" aria-label="Scroll live left">‹</button>
+          <button id="liveRight" class="slider-btn" aria-label="Scroll live right">›</button>
+        </div>
+      </div>
+
+      <div id="liveSkeleton" class="mt-4 slider flex gap-4 overflow-x-auto pb-2">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card hidden sm:block"></div>
+        <div class="skeleton-card hidden md:block"></div>
+      </div>
+
+      <div id="liveWrap" class="mt-4 hidden">
+        <div id="liveSlider" class="slider"></div>
+      </div>
+
+      <div id="liveEmpty" class="mt-4 hidden rounded-3xl border border-white/10 bg-white/5 p-6 text-center text-zinc-300">
+        No live events right now.
+      </div>
+    </section>
+
+    <!-- UPCOMING -->
+    <section class="mt-10">
+      <div class="flex items-end justify-between gap-3">
+        <div>
+          <h2 class="text-xl font-extrabold">🟦 Coming Up</h2>
+          <p class="text-sm text-zinc-400">Upcoming occurrences (next 14 days). Click to open player with countdown.</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="upLeft" class="slider-btn" aria-label="Scroll upcoming left">‹</button>
+          <button id="upRight" class="slider-btn" aria-label="Scroll upcoming right">›</button>
+        </div>
+      </div>
+
+      <div id="upSkeleton" class="mt-4 slider flex gap-4 overflow-x-auto pb-2">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card hidden sm:block"></div>
+        <div class="skeleton-card hidden md:block"></div>
+      </div>
+
+      <div id="upWrap" class="mt-4 hidden">
+        <div id="upcomingSlider" class="slider"></div>
+      </div>
+
+      <div id="upEmpty" class="mt-4 hidden rounded-3xl border border-white/10 bg-white/5 p-6 text-center text-zinc-300">
+        No upcoming occurrences in the next 14 days.
+      </div>
+    </section>
+
+    <!-- TIMELINE (EPG-style) -->
+    <section id="timelineSection" class="mt-12">
+      <div class="flex items-end justify-between gap-3">
+        <div>
+          <h2 class="text-xl font-extrabold">📅 Timeline (Next 7 Days)</h2>
+          <p class="text-sm text-zinc-400">Like a TV guide: grouped by date, with countdown per occurrence.</p>
+        </div>
+      </div>
+
+      <div id="timeline" class="mt-4 grid gap-4"></div>
+    </section>
+
+    <footer class="mt-12 text-xs text-zinc-500">
+      <div class="border-t border-white/10 pt-6">
+        <p>
+          Template platform. Use authorized streams that allow iframe embedding.
+          Some providers block embedding with headers (X-Frame-Options / CSP).
+        </p>
+      </div>
+    </footer>
+
+  </main>
+
+  <script type="module" src="js/home.js"></script>
+</body>
+</html>
