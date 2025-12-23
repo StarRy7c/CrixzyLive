@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Player · Live Sports Hub</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { fontFamily: { sans: ['ui-sans-serif', 'system-ui', 'Segoe UI', 'Roboto', 'Arial'] } } }
+    }
+  </script>
+
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+
+<body class="min-h-screen bg-black text-zinc-100 select-none">
+
+  <header class="sticky top-0 z-50 backdrop-blur bg-black/55 border-b border-white/10">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center gap-3">
+      <a href="index.html" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10">
+        ← Back
+      </a>
+
+      <div class="flex-1 min-w-0">
+        <div id="eventTitle" class="text-lg sm:text-xl font-extrabold truncate">Loading…</div>
+        <div class="flex flex-wrap items-center gap-2 text-xs text-zinc-400 mt-1">
+          <span id="statusBadge" class="inline-flex items-center gap-2 px-2 py-1 rounded-full bg-white/5 border border-white/10">
+            <span id="statusDot" class="inline-block w-2 h-2 bg-zinc-400 rounded-full"></span>
+            <span id="statusText">—</span>
+          </span>
+          <span id="eventWindow"></span>
+          <span class="opacity-60">•</span>
+          <span id="eventDate"></span>
+          <span class="opacity-60">•</span>
+          <span id="occLabel" class="font-mono"></span>
+        </div>
+      </div>
+
+      <button id="theaterBtn" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10">
+        Theater
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-6">
+
+    <!-- UPCOMING BOX -->
+    <section id="upcomingBox" class="hidden">
+      <div class="rounded-3xl border border-white/10 bg-white/5 p-7 text-center">
+        <div class="text-4xl">⏳</div>
+        <div class="mt-2 text-lg font-black">This event is starting soon</div>
+        <p class="mt-1 text-sm text-zinc-400">Player will auto-start when the live window begins.</p>
+
+        <div class="mt-5 grid gap-3 sm:grid-cols-2 max-w-xl mx-auto">
+          <div class="rounded-2xl bg-black/30 border border-white/10 p-4">
+            <div class="text-xs text-zinc-400">Starts in</div>
+            <div id="startCountdown" class="mt-1 font-mono text-2xl font-black">--:--:--</div>
+          </div>
+          <div class="rounded-2xl bg-black/30 border border-white/10 p-4">
+            <div class="text-xs text-zinc-400">Start time</div>
+            <div id="startTimeLabel" class="mt-1 text-sm font-extrabold">—</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ENDED BOX -->
+    <section id="endedBox" class="hidden">
+      <div class="rounded-3xl border border-white/10 bg-white/5 p-7 text-center">
+        <div class="text-4xl">✅</div>
+        <div class="mt-2 text-lg font-black">This occurrence has finished</div>
+        <p class="mt-1 text-sm text-zinc-400">Check the homepage for the next one.</p>
+
+        <a href="index.html" class="mt-5 inline-block px-4 py-2 rounded-xl bg-red-500 hover:bg-red-400 text-black font-extrabold">
+          Go to homepage
+        </a>
+      </div>
+    </section>
+
+    <!-- PLAYER AREA -->
+    <section id="playerArea" class="grid gap-5">
+      <div id="playerShell" class="player-shell border border-white/10 bg-zinc-950 rounded-3xl overflow-hidden relative">
+        <div class="player-topbar absolute top-3 left-3 z-10 flex items-center gap-2">
+          <span class="inline-flex items-center gap-2 px-2 py-1 rounded-full bg-black/60 border border-white/10 text-xs">
+            <span class="inline-block w-2 h-2 bg-red-500 rounded-full animate-liveDot"></span>
+            LIVE PLAYER
+          </span>
+          <span id="channelNow" class="text-xs px-2 py-1 rounded-full bg-white/10 border border-white/10">—</span>
+          <span class="text-xs px-2 py-1 rounded-full bg-white/10 border border-white/10">
+            Ends in <span id="endCountdown" class="font-mono">--:--:--</span>
+          </span>
+        </div>
+
+        <div class="absolute inset-0 pointer-events-none player-shield"></div>
+
+        <iframe
+          id="videoFrame"
+          class="w-full h-full block"
+          src="about:blank"
+          title="Live stream player"
+          frameborder="0"
+          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+          allowfullscreen
+          loading="lazy"
+        ></iframe>
+      </div>
+
+      <div class="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+        <div>
+          <div class="text-sm font-bold">Channels</div>
+          <div class="text-xs text-zinc-400">Tap to switch instantly (no reload).</div>
+        </div>
+
+        <div class="w-full md:w-auto">
+          <div id="channelsRow" class="flex flex-wrap gap-2"></div>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-4 text-xs text-zinc-400">
+        <div class="font-semibold text-zinc-200">Protections (best-effort)</div>
+        <ul class="list-disc ml-4 mt-1 space-y-1">
+          <li>Right-click disabled on this page (cannot control inside iframe).</li>
+          <li>Stream URLs are only injected when needed (basic JS obfuscation).</li>
+          <li>Last chosen channel per event is remembered (localStorage).</li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+  <script type="module" src="js/player.js"></script>
+</body>
+</html>
