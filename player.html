@@ -94,17 +94,18 @@
         </div>
 
         <div class="absolute inset-0 pointer-events-none player-shield"></div>
-
-        <iframe
-          id="videoFrame"
-          class="w-full h-full block"
-          src="about:blank"
-          title="Live stream player"
-          frameborder="0"
-          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-          allowfullscreen
-          loading="lazy"
-        ></iframe>
+<iframe
+  id="videoFrame"
+  class="w-full h-full block"
+  src="about:blank"
+  title="Live stream player"
+  frameborder="0"
+  sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"
+  allow="encrypted-media"
+  allowfullscreen="true"
+  scrolling="no"
+  loading="lazy"
+></iframe>
       </div>
 
       <div class="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
