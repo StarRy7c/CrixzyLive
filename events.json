@@ -16,6 +16,24 @@
       { "date": "2025-12-15", "time": { "start": "15:00", "end": "17:00" } }
     ]
   },
+  
+  {
+    "event_id": "womenT20",
+    "event_name": "india women vs sri lanka women t20",
+    "poster": "Screenshot_2025-12-23-19-21-03-27_948cd9899890cbd5c2798760b2b95377.jpg",
+
+    "date_type": "range",
+    "start_date": "2025-12-03",
+    "end_date": "2026-01-26",
+
+    "time": { "start": "19:00", "end": "23:00" },
+
+    "channels": ["WILLOW", "SS1"],
+
+    "extra_occurrences": [
+      { "date": "2025-12-15", "time": { "start": "15:00", "end": "17:00" } }
+    ]
+  },
 
   {
     "event_id": "ipl_special_2025",
