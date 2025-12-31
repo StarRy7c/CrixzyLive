@@ -26,9 +26,9 @@
     "start_date": "2025-12-03",
     "end_date": "2026-01-26",
 
-    "time": { "start": "21:00", "end": "1:00" },
+    "time": { "start": "15:00", "end": "1:00" },
 
-    "channels": ["WILLOW", "SS1"],
+    "channels": ["WILLOW", "cricbuzz"],
 
     "extra_occurrences": [
       { "date": "2025-12-15", "time": { "start": "15:00", "end": "17:00" } }
@@ -42,7 +42,7 @@
 
     "date_type": "range",
     "start_date": "2025-12-03",
-    "end_date": "2026-01-26",
+    "end_date": "2025-12-24",
 
     "time": { "start": "19:00", "end": "23:00" },
 
