@@ -14,11 +14,6 @@ const els = {
   forceRefresh: document.getElementById("forceRefresh"),
   scrollToTimeline: document.getElementById("scrollToTimeline"),
 
-  nextUpName: document.getElementById("nextUpName"),
-  nextUpCountdown: document.getElementById("nextUpCountdown"),
-  nextUpTime: document.getElementById("nextUpTime"),
-  nextUpLink: document.getElementById("nextUpLink"),
-
   liveSkeleton: document.getElementById("liveSkeleton"),
   liveWrap: document.getElementById("liveWrap"),
   liveSlider: document.getElementById("liveSlider"),
@@ -198,28 +193,6 @@ function renderSliders() {
     requestAnimationFrame(() => updateArrowState(els.upcomingSlider, els.upLeft, els.upRight));
   }
 
-  // Next Up box
-  const next = upcoming[0];
-  if (!next) {
-    els.nextUpName.textContent = "No upcoming in horizon";
-    els.nextUpCountdown.textContent = "--:--:--";
-    els.nextUpTime.textContent = "—";
-    els.nextUpLink.href = "#";
-    els.nextUpLink.textContent = "No upcoming event";
-    els.nextUpLink.style.opacity = "0.6";
-    els.nextUpLink.style.pointerEvents = "none";
-  } else {
-    els.nextUpName.textContent = next.event_name;
-    els.nextUpTime.textContent = formatDT(next.startDT);
-    els.nextUpLink.href = `player.html?event=${encodeURIComponent(next.event_id)}&occ=${encodeURIComponent(next.occ_key)}`;
-    els.nextUpLink.textContent = "Open next event";
-    els.nextUpLink.style.opacity = "1";
-    els.nextUpLink.style.pointerEvents = "auto";
-    // Countdown value is updated by global countdown tick
-    els.nextUpCountdown.setAttribute("data-nextup-target", String(next.startDT.getTime()));
-  }
-}
-
 function renderTimeline() {
   const now = new Date();
   const todayIso = toISODate(now);
@@ -340,12 +313,6 @@ function updateCountdownUI() {
     const ms = target - now;
     el.textContent = msToHMS(ms);
   });
-
-  // Next Up big box countdown
-  const nextTarget = Number(els.nextUpCountdown.getAttribute("data-nextup-target"));
-  if (Number.isFinite(nextTarget)) {
-    els.nextUpCountdown.textContent = msToHMS(nextTarget - now);
-  }
 }
 
 function scheduleBoundaryRefresh() {
