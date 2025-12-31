@@ -192,6 +192,7 @@ function renderSliders() {
     for (const occ of upcoming.slice(0, 25)) els.upcomingSlider.appendChild(buildCard(occ, "upcoming"));
     requestAnimationFrame(() => updateArrowState(els.upcomingSlider, els.upLeft, els.upRight));
   }
+}
 
 function renderTimeline() {
   const now = new Date();
