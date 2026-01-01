@@ -10,7 +10,7 @@
 
     "time": { "start": "13:00", "end": "18:00" },
 
-    "channels": ["WILLOW", "SS2", "FOX", "cricbuzz"],
+    "channels": ["WILLOW", "SS22", "SS2", "FOX", "cricbuzz"],
 
     "extra_occurrences": [
       { "date": "2025-12-15", "time": { "start": "15:00", "end": "17:00" } }
